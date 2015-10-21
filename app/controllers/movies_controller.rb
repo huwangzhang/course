@@ -11,7 +11,20 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = ["G","PG","PG-13","R"]
+
+    if params[:sort] == "release_date"
+      @movies = Movie.all.order("#{params[:sort]}")
+      @release_date_header = "hilite"
+    elsif params[:sort] =="title"
+      @movies = Movie.all.order("title")
+      @title_header = "hilite"
+    else
+      @movies = Movie.all
+    end
+    if params[:ratingfilter]
+      @movies = Movie.where(:rating => "#{params[:ratingfilter]}")
+    end
   end
 
   def new
@@ -42,4 +55,7 @@ class MoviesController < ApplicationController
     redirect_to movies_path
   end
 
+  def return
+    redirect_to movies_path
+  end
 end
