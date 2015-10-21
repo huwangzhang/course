@@ -12,6 +12,7 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = ["G","PG","PG-13","R"]
+    @checkyn = Hash.new(false)
 
     if params[:sort] == "release_date"
       @movies = Movie.all.order("#{params[:sort]}")
@@ -22,8 +23,12 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.all
     end
-    if params[:ratingfilter]
-      @movies = Movie.where(:rating => "#{params[:ratingfilter]}")
+    if params[:ratings]
+      @movies = Movie.where rating:params[:ratings].keys
+      params[:ratings].keys.each do |c|
+        @checkyn[c]= true
+        p @checkyn
+      end
     end
   end
 
