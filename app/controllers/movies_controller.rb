@@ -12,24 +12,52 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = ["G","PG","PG-13","R"]
-    @checkyn = Hash.new(false)
+    @checked_flag = Hash.new(false)
 
-    if params[:sort] == "release_date"
-      @movies = Movie.all.order("#{params[:sort]}")
-      @release_date_header = "hilite"
-    elsif params[:sort] =="title"
-      @movies = Movie.all.order("title")
-      @title_header = "hilite"
-    else
-      @movies = Movie.all
+    if params[:sort]
+      session[:sort] = params[:sort]
     end
+
     if params[:ratings]
-      @movies = Movie.where rating:params[:ratings].keys
-      params[:ratings].keys.each do |c|
-        @checkyn[c]= true
-        p @checkyn
+      session[:ratings] = params[:ratings]
+    end
+
+    if session[:ratings]
+      if session[:sort] == "release_date"
+        #@movies = Movie.all.order("release_date")
+        @movies = Movie.all.order("release_date").where rating:session[:ratings].keys
+        session[:ratings].keys.each do |c|
+          @checked_flag[c]= true
+        end
+        @release_date_header = "hilite"
+      elsif session[:sort] =="title"
+        #@movies = Movie.all.order("title")
+        @movies = Movie.all.order("title").where rating:session[:ratings].keys
+        session[:ratings].keys.each do |c|
+          @checked_flag[c]= true
+        end
+        @title_header = "hilite"
+      else
+        #@movies = Movie.all
+        @movies = Movie.all.where rating:session[:ratings].keys
+        session[:ratings].keys.each do |c|
+          @checked_flag[c]= true
+        end
+      end
+    else
+      if session[:sort] == "release_date"
+        @movies = Movie.all.order("release_date")
+        @release_date_header = "hilite"
+      elsif session[:sort] =="title"
+        @movies = Movie.all.order("title")
+        @title_header = "hilite"
+      else
+        @movies = Movie.all
       end
     end
+
+
+
   end
 
   def new
